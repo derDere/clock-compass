@@ -3,11 +3,27 @@ var checkbox;
 var sun;
 var centerEle = document.getElementsByTagName('center')[0];
 
+var showCompass = false;
+var noGps = false;
+var compasAngle = 0;
+
 function preload() {
   sun = loadImage('sun.png');
 }
 
 function setup() {
+  Compass.needGPS(function () {
+    noGps = true;
+  }).needMove(function () {
+  }).init(function () {
+  }).noSupport(function () {
+    showCompass = false;
+  }).watch(function (heading) {
+    showCompass = true;
+    noGps = false;
+    compasAngle = (heading / 360) * (2 * PI);
+  });
+
   createCanvas(900, 900);
   
   let now = new Date();
@@ -64,6 +80,24 @@ function draw() {
   
   // Translate to center
   translate(width / 2, height / 2);
+  
+  // Draw Compass
+  if (showCompass) {
+    push();
+    if (!noGps) {
+      stroke(255, 0, 0);
+    } else {
+      stroke(0, 255, 0);
+    }
+    strokeWeight(30);
+    line(
+      0,
+      0,
+      cos(compasAngle) * 430,
+      sin(compasAngle) * 430
+    );
+    pop();
+  }
   
   // Draw Background
   push();
