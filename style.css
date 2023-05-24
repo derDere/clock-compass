@@ -4,6 +4,7 @@ html, body {
   background: black;
   color: #fff;
   font-family: arial;
+	min-height: 100%;
 }
 canvas {
   display: block;
