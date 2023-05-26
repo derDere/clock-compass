@@ -1,64 +1,59 @@
 var slider;
 var checkbox;
 var sun;
-var centerEle = document.getElementsByTagName('center')[0];
+var contentEle = document.getElementById('content');
+var mainEle = document.getElementById('main');
+var dseEle = document.getElementById('dse-content');
 
-var showCompass = false;
-var noGps = false;
-var compasAngle = 0;
+function toggleDseVisibility() {
+  if (dseEle.style.display === 'none') {
+    dseEle.style.display = 'block';
+  } else {
+    dseEle.style.display = 'none';
+  }
+}
 
 function preload() {
-  sun = loadImage('sun.png');
+  sun = loadImage('gfx/sun.png');
 }
 
 function setup() {
-  Compass.needGPS(function () {
-    noGps = true;
-  }).needMove(function () {
-  }).init(function () {
-  }).noSupport(function () {
-    showCompass = false;
-  }).watch(function (heading) {
-    showCompass = true;
-    noGps = false;
-    compasAngle = (heading / 360) * (2 * PI);
-  });
+  let can = createCanvas(900, 900);
+  can.parent(mainEle);
 
-  createCanvas(900, 900);
-  
   let now = new Date();
   let t1 = new Date();
   let t2 = new Date();
-  
+
   t1.setHours(0);
   t1.setMinutes(0);
   t1.setSeconds(0);
-  
+
   t2.setHours(24);
   t2.setMinutes(0);
   t2.setSeconds(0);
-  
+
   slider = createSlider(t1.getTime(), t2.getTime(), now.getTime());
   slider.size(800, 30);
-  slider.parent(centerEle);
-  
+  slider.parent(contentEle);
+
   checkbox = createCheckbox("Use current time");
   checkbox.checked(true);
-  checkbox.parent(centerEle);
+  checkbox.parent(contentEle);
 }
 
 function draw() {
   background(0);
-  
+
   // Calculate time values
   let t;
   if (checkbox.checked()) {
     t = new Date();
     slider.value(t.getTime());
   } else {
-    t = new Date(slider.value()); 
+    t = new Date(slider.value());
   }
-  
+
   let h = t.getHours();
   let h2 = t.getHours();
   let m = t.getMinutes();
@@ -67,38 +62,20 @@ function draw() {
   let MMs = ((m < 10) ? '0' : '') + m;
   let SSs = ((s < 10) ? '0' : '') + s;
   let TTs = HHs + ':' + MMs + ':' + SSs;
-  
+
   h %= 12;
-  
+
   let hh = h + (m / 60) + (s / 60 / 60);
   let hh2 = h2 + (m / 60) + (s / 60 / 60);
   let mm = m + (s / 60);
   let ss = s;
-  
+
   let delta = 12 - hh2;
   let so = hh2 + (delta / 2);
-  
+
   // Translate to center
   translate(width / 2, height / 2);
-  
-  // Draw Compass
-  if (showCompass) {
-    push();
-    if (!noGps) {
-      stroke(255, 0, 0);
-    } else {
-      stroke(0, 255, 0);
-    }
-    strokeWeight(30);
-    line(
-      0,
-      0,
-      cos(compasAngle) * 430,
-      sin(compasAngle) * 430
-    );
-    pop();
-  }
-  
+
   // Draw Background
   push();
   fill(255);
@@ -106,14 +83,14 @@ function draw() {
   strokeWeight(4);
   circle(0, 0, 836);
   pop();
-  
+
   // Draw Clock Background
   push();
   fill(230);
   noStroke();
   circle(0, 0, 600);
   pop();
-  
+
   // Draw Minute Lines
   for(let i = 1; i <= 60; i++) {
     if (i % 5 != 0) {
@@ -126,7 +103,7 @@ function draw() {
       pop();
     }
   }
-  
+
   // Draw Numbers
   for(let i = 1; i <= 12; i++) {
     push();
@@ -139,7 +116,7 @@ function draw() {
     text(i, x, y);
     pop();
   }
-  
+
   // Draw NESW Lines
   push();
   strokeWeight(1);
@@ -172,7 +149,7 @@ function draw() {
     sin((so - 9) * ((2 * PI) / 12)) * 250
   );
   pop();
-  
+
   // Draw Digital Clock
   push();
   textFont('Courier New');
@@ -180,7 +157,7 @@ function draw() {
   textAlign(CENTER);
   text(TTs, 0, 60);
   pop();
-  
+
   // Draw Hour arm
   push();
   strokeWeight(20);
@@ -193,7 +170,7 @@ function draw() {
     sin((hh - 3) * ((2 * PI) / 12)) * 160
   );
   pop();
-  
+
   // Draw Minute arm
   push();
   strokeWeight(10);
@@ -206,7 +183,7 @@ function draw() {
     sin((mm - 15) * ((2 * PI) / 60)) * 210
   );
   pop();
-  
+
   // Draw Second arm
   push();
   strokeWeight(2);
@@ -219,14 +196,14 @@ function draw() {
     sin((s - 15) * ((2 * PI) / 60)) * 250
   );
   pop();
-  
+
   // Draw center dot
   push();
   fill(130);
   noStroke();
   circle(0, 0, 30);
   pop();
-  
+
   // Draw Sun
   push();
   translate(
@@ -236,7 +213,7 @@ function draw() {
   imageMode(CENTER);
   image(sun, 0, 0);
   pop();
-  
+
   // Draw West
   push();
   rotate((so - 0) * ((2 * PI) / 12));
@@ -246,7 +223,7 @@ function draw() {
   textAlign(CENTER, CENTER);
   text("W",0,0);
   pop();
-  
+
   // Draw South
   push();
   rotate((so - 3) * ((2 * PI) / 12));
@@ -256,7 +233,7 @@ function draw() {
   textAlign(CENTER, CENTER);
   text("S",0,0);
   pop();
-  
+
   // Draw East
   push();
   rotate((so - 6) * ((2 * PI) / 12));
@@ -266,7 +243,7 @@ function draw() {
   textAlign(CENTER, CENTER);
   text("E",0,0);
   pop();
-  
+
   // Draw South
   push();
   rotate((so - 9) * ((2 * PI) / 12));
